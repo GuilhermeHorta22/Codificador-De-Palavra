@@ -1,52 +1,192 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <conio2.h>
-#include <ctype.h>
+#include<stdio.h>
+#include<string.h>
+#include<stdlib.h>
+#include<conio2.h>
+#include<time.h>
 
-#include "Arquivo.h"
-#include "Arvore.h"
-#include "Pilha.h"
-#include "PilhaHuffman.h"
-//#include "listaCelula.h"
-//#include "listaArvore.h"
+#include "tadHuff.h"
 
-#define TF 2000
+void insereLista(char palavra[30], AuxStr **list) {
+	AuxStr *novo = (AuxStr*)malloc(sizeof(AuxStr));
+	
+	strcpy(novo->palavra, palavra);
+	novo->prox = *list;
+	*list = novo;
+}
 
-struct bits
-{
-	unsigned char b7:1;
-	unsigned char b6:1;
-	unsigned char b5:1;
-	unsigned char b4:1;
-	unsigned char b3:1;
-	unsigned char b2:1;
-	unsigned char b1:1;
-	unsigned char b0:1;
-};
-
-union byte
-{
-	struct bits bi;
-	unsigned char num;
-};
-
-
-void exibeHuffman(tree *raiz)
-{
-    static int n = -1;
-    if(raiz != NULL)
-    {
-        n++;
-        exibeHuffman(raiz->dir); 
-
-        for (int i = 0; i < 5 * n; i++)
-            printf(" ");
-
-        printf("(%d, %d)\n", raiz->simbolo, raiz->freq);
-
-        exibeHuffman(raiz->esq);
-
-        n--;
+char buscaPalavra(char palavra[30], AuxStr *list) {
+    while (list != NULL && strcmp(list->palavra, palavra) != 0) {
+        list = list->prox;
     }
+    if(list == NULL)
+    	return 1;
+    return 0;
+}
+
+void separaFrase(char frase[], AuxStr **list) {
+	int i=0, j;
+	char palavra[30];
+	
+	while(frase[i] != '\0') {
+		if(frase[i] > 64 && frase[i] < 91 || frase[i] > 96 && frase[i] < 123 || frase[i] == '-') {
+			for(j=0 ; frase[i] > 64 && frase[i] < 91 || frase[i] > 96 && frase[i] < 123 || frase[i] == '-' ; j++) {
+				if(frase[i] > 64 && frase[i] < 91)
+					palavra[j] = frase[i]+32;
+				else
+					palavra[j] = frase[i];
+				i++; 
+			}
+			palavra[j] = '\0';
+			i--;
+			if(buscaPalavra(palavra, *list))
+				insereLista(palavra, &*list);
+		}
+		i++;
+	}
+	for(i=0 ; frase[i] != ' ' ; i++)
+		i++;
+	
+	if(frase[i] != '\0') {
+		palavra[0] = ' ';
+		palavra[1] = '\0';
+		insereLista(palavra, *&list);
+	}
+}
+
+void ajustar(AuxStr *list, AuxStr **alterado) {
+	AuxStr *aux = list;
+	
+	while(aux != NULL) {
+		insereLista(aux->palavra, &*alterado);
+		aux = aux->prox;
+	}
+}
+
+void clivar(char frase[], AuxStr **list) {
+	AuxStr *aux = NULL;
+	int i=0, j;
+	char palavra[30];
+	
+	while(frase[i] != '\0') {
+		if(frase[i] > 64 && frase[i] < 91 || frase[i] > 96 && frase[i] < 123 || frase[i] == '-') {
+			for(j=0 ; frase[i] > 64 && frase[i] < 91 || frase[i] > 96 && frase[i] < 123 || frase[i] == '-' ; j++) {
+				if(frase[i] > 64 && frase[i] < 91)
+					palavra[j] = frase[i]+32;
+				else
+					palavra[j] = frase[i];
+				i++; 
+			}
+			palavra[j] = '\0';
+			i--;
+			insereLista(palavra, *&list);
+		}
+		else {
+			if(frase[i] == ' ') {
+				for(j=0 ; frase[i] == ' ' ; i++, j++)
+					palavra[j] = frase[i];
+				palavra[j] = '\0';
+				i--;
+				insereLista(palavra, *&list);
+			}
+		}
+		i++;
+	}
+}
+
+void contaPalavras(AuxStr **aux, char frase[]) {
+	int i=0,j;
+	(*aux)->qtde = 0;
+	char palavra[30];
+	if(strcmp((*aux)->palavra," ")!=0)
+		while(frase[i]!='\0')
+		{
+			if(frase[i]>64&&frase[i]<91||frase[i]>96&&frase[i]<123||frase[i]=='-')
+			{
+				
+				for(j=0;frase[i]>64&&frase[i]<91||frase[i]>96&&frase[i]<123||frase[i]=='-';j++)
+				{
+					if(frase[i]>64&&frase[i]<91)
+						palavra[j] = frase[i]+32;
+					else
+						palavra[j] = frase[i];
+					i++;
+				}
+				palavra[j] = '\0';
+				i--;
+				if(strcmp((*aux)->palavra,palavra)==0)
+					(*aux)->qtde++;	
+			}
+				i++;		
+		}
+	else
+		for(i=0;frase[i]!='\0';i++)
+			if(frase[i]==' ')
+				(*aux)->qtde++;
+}
+
+void setQtdeAll(char frase[], AuxStr **palavras) {
+	AuxStr *auxS = *palavras;
+	
+	while(auxS != NULL) {
+		contaPalavras(&auxS, frase);
+		auxS = auxS->prox;
+	}
+}
+void exibeTabelaHuffman(struct auxString *list) {
+    printf("\n--- TABELA DE HUFFMAN ---\n");
+    printf("%-10s %-20s %-12s %-20s\n", "Simbolo", "Palavra", "Frequencia", "Codigo");
+
+    while (list != NULL) {
+        if (strcmp(list->palavra, " ") != 0) // Ignora entradas de espaço, se quiser
+            printf("%-10c %-20s %-12d %-20s\n", list->simbolo, list->palavra, list->qtde, list->codHuff);
+        list = list->prox;
+    }
+}
+//void exibeh(listTree *raiz)
+//{
+//	printf("Arvore");
+//    static int n = -1;
+//    if (raiz != NULL)
+//    {
+//        n++;
+//        exibeh(raiz->); 
+
+//        for (int i = 0; i < 5 * n; i++)
+//            printf(" ");
+
+//        printf("(%d, %d)\n", raiz->arv->simbolo, raiz->arv-> qtde);
+
+//        exibeh(raiz->esq);
+
+//        n--;
+//    }
+//}
+int main(void) {
+	AuxStr *list = NULL, *auxL, *alterado = NULL;
+	ListTree *lTree = NULL, *auxTree;
+	int TL = 0;
+	char frase[1000], auxC[30];
+	strcpy(frase, "A tecnologia transforma o mundo ao conectar pessoas, ideias e oportunidades. Por meio de solucoes criativas, inteligentes e acessiveis, e possivel aproximar comunidades, otimizar processos e impulsionar o desenvolvimento.");
+	printf("Texto usado para codificacao: %s\n\n", frase);
+
+	separaFrase(frase, &list);
+	
+	setQtdeAll(frase, &list);
+	
+	auxL = list;
+	while(auxL != NULL) {
+		criaLista(&lTree, &auxL);
+		auxL = auxL->prox;
+	}
+	
+	criaHuffman(&lTree);
+	
+	adicionaCodHuff(lTree->arv, auxC, &TL, &list);
+	exibeTabelaHuffman(list);
+	salvaTabelaArq(list);
+	exibeh(lTree->arv);
+	auxL = NULL;
+	clivar("A tecnologia conecta pessoas com conhecimento e inovacao", &auxL);
+	ajustar(auxL, &alterado);
+	comprimeFrase(alterado, list);
 }
