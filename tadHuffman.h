@@ -1,28 +1,33 @@
-struct tree {
+struct tree 
+{
 	char simbolo;
 	int qtde;
 	struct tree *dir, *esq;
 };
 typedef struct tree Tree;
 
-struct listTree {
+struct listTree 
+{
 	struct tree *arv;
 	struct listTree *prox;
 };
 typedef struct listTree ListTree;
 
-struct auxString {
+struct auxString 
+{
 	char palavra[30], codHuff[30], simbolo;
 	int qtde;
 	struct auxString *prox;
 };
 typedef struct auxString AuxStr;
 
-char criaSimbolo() {
+char criaSimbolo() 
+{
 	return rand() % 26 + 65;
 }
 
-char existeSim(ListTree *L, char simb) {
+char existeSimbolo(ListTree *L, char simb) 
+{
 	while(L != NULL && L->arv->simbolo != simb)
 		L = L->prox;
 		
@@ -31,30 +36,35 @@ char existeSim(ListTree *L, char simb) {
 	return 0;
 }
 
-void ordenaLista(ListTree **L, ListTree **novo) {
+void ordenaLista(ListTree **L, ListTree **novo) 
+{
 	ListTree *ant=NULL, *aux=*L;
 	
-	while(aux != NULL && (*novo)->arv->qtde > aux->arv->qtde) {
+	while(aux != NULL && (*novo)->arv->qtde > aux->arv->qtde) 
+	{
 		ant = aux;
 		aux = aux->prox;
 	}
 	
-	if(ant == NULL) {
+	if(ant == NULL) 
+	{
 		(*novo)->prox = *L;
 		*L = *novo;
 	}
-	else {
-		if(aux == NULL) {
+	else 
+	{
+		if(aux == NULL)
 			ant->prox = *novo;
-		}
-		else {
+		else 
+		{
 			ant->prox = *novo;
 			(*novo)->prox = aux;
 		}
 	}
 }
 
-void criaLista(ListTree **listI, AuxStr **auxS) {
+void criaLista(ListTree **listI, AuxStr **auxS) 
+{
 	ListTree *novoList = (ListTree*)malloc(sizeof(ListTree));
 	Tree *novoTree = (Tree*)malloc(sizeof(Tree));
 	
@@ -62,7 +72,7 @@ void criaLista(ListTree **listI, AuxStr **auxS) {
 	novoTree->esq = novoTree->dir = NULL;
 	novoTree->simbolo = criaSimbolo();
 	
-	while(existeSim(*listI, novoTree->simbolo))
+	while(existeSimbolo(*listI, novoTree->simbolo))
 		novoTree->simbolo = criaSimbolo();
 	
 	novoList->arv = novoTree;
@@ -97,23 +107,26 @@ void criaNovaCaixaL(Tree **pri, Tree **seg, ListTree **novo) {
 	
 }
 
-void criaHuffman(ListTree **listI) {
+void criaHuffman(ListTree **listI) 
+{
     ListTree *novo;
     
-    while ((*listI) && (*listI)->prox) {
-        ListTree *prim = *listI;
-        ListTree *seg = prim->prox;
+    while((*listI) && (*listI)->prox) 
+	{
+        ListTree *list1 = *listI;
+        ListTree *list2 = list1->prox;
 
-        criaNovaCaixaL(&prim->arv, &seg->arv, &novo);
+        criaNovaCaixaL(&list1->arv, &list2->arv, &novo);
 
-        *listI = seg->prox;
+        *listI = list2->prox;
 
-        free(prim);
-        free(seg);
+        free(list1);
+        free(list2);
 
         ordenaLista(listI, &novo);
     }
 }
+
 void exibeh(tree *raiz)
 {
     static int n = -1;
@@ -133,20 +146,25 @@ void exibeh(tree *raiz)
     }
 }
 
-void adicionaCodHuff(Tree *raiz, char cod[20], int *TL, AuxStr **list) {
+void adicionaCodHuff(Tree *raiz, char cod[1000], int *TL, AuxStr **list) 
+{
 	AuxStr *aux;
 	
-	if(raiz != NULL) {
-		if(raiz->esq != NULL) {
+	if(raiz != NULL) 
+	{
+		if(raiz->esq != NULL) 
+		{
 			cod[*TL] = '0';
 			*TL = *TL + 1;
 			cod[*TL] = '\0';
 		}
 		else
 			*TL = *TL + 1;
+			
 		adicionaCodHuff(raiz->esq, cod, &*TL, &*list);
 		*TL = *TL - 1;
-		if(raiz->dir != NULL) {
+		if(raiz->dir != NULL) 
+		{
 			cod[*TL] = '1';
 			*TL = *TL + 1;
 			cod[*TL] = '\0';
@@ -156,7 +174,6 @@ void adicionaCodHuff(Tree *raiz, char cod[20], int *TL, AuxStr **list) {
 		
 		adicionaCodHuff(raiz->dir, cod, &*TL, &*list);
 		*TL = *TL - 1;
-		
 		aux = *list;
 		while(aux != NULL && aux->simbolo != raiz->simbolo)
 			aux = aux->prox;
@@ -166,36 +183,40 @@ void adicionaCodHuff(Tree *raiz, char cod[20], int *TL, AuxStr **list) {
 	}
 }
 
-void salvaTabelaArq(AuxStr *list) {
+void salvarArqBin(AuxStr *list) 
+{
 	AuxStr Reg;
 	FILE *ptrArq = fopen("tabela.dat", "wb");
 	
-	while(list!=NULL) {
+	while(list!=NULL) 
+	{
 		strcpy(Reg.palavra, list->palavra);
 		strcpy(Reg.codHuff, list->codHuff);
 		Reg.qtde = list->qtde;
 		Reg.simbolo = list->simbolo;
 		Reg.prox = NULL;
 		
-		fwrite(&Reg, sizeof(AuxStr), 1, ptrArq);
+		fwrite(&Reg,sizeof(AuxStr),1,ptrArq);
 		
 		list = list->prox;
 	}
 	fclose(ptrArq);
-
 }
 
-void comprimeFrase(AuxStr *aux, AuxStr *map) {
+void comprimeFrase(AuxStr *aux, AuxStr *map) 
+{
 	FILE *ptrArq = fopen("frase-comprimida.txt", "w+");
 	char cod[250];
 	int TL=0, i;
 	AuxStr *mapAux = map;
 	
-	while(aux != NULL) {
+	while(aux != NULL) 
+	{
 		while(mapAux != NULL && strcmp(aux->palavra, mapAux->palavra) != 0)
 			mapAux = mapAux->prox;
 		
-		if(mapAux != NULL) {
+		if(mapAux != NULL) 
+		{
 			for(i=0 ; mapAux->codHuff[i] != '\0' ; i++, TL++)
 				cod[TL] = mapAux->codHuff[i];
 		}
@@ -206,9 +227,9 @@ void comprimeFrase(AuxStr *aux, AuxStr *map) {
 	fprintf(ptrArq, "%s\n", cod);
 }
 
-Tree* criaNoTree(char simbolo) {
+Tree* criaNoTree(char simbolo) 
+{
 	Tree *novo = (Tree*)malloc(sizeof(Tree));
-	
 	novo->simbolo = simbolo;
 	novo->esq = novo->dir = NULL;
 	novo->qtde = 0;
@@ -220,21 +241,27 @@ void recuperaArv(Tree **raiz, AuxStr *list) {
 	Tree *aux;
 	int i;
 	
-	*raiz = criaNoTree('#');
+	*raiz = criaNoTree('$');
 	aux = *raiz;
 	
-	while(list != NULL) {
-		for(i=0 ; list->codHuff[i] != '\0' ; i++) {
-			if(list->codHuff[i] == '0') {
-				if((*raiz)->esq != NULL) {
+	while(list != NULL) 
+	{
+		for(i=0 ; list->codHuff[i] != '\0' ; i++) 
+		{
+			if(list->codHuff[i] == '0') 
+			{
+				if((*raiz)->esq != NULL) 
+				{
 					if(list->codHuff[i+1] == '\0')
 						(*raiz)->esq->simbolo = list->simbolo;
 					else
 						*raiz = (*raiz)->esq;
 				}
-				else {
-					if(list->codHuff[i+1] != '\0') {
-						(*raiz)->esq = criaNoTree('#');
+				else 
+				{
+					if(list->codHuff[i+1] != '\0') 
+					{
+						(*raiz)->esq = criaNoTree('$');
 						*raiz = aux;
 						i = -1;
 					}
@@ -243,16 +270,20 @@ void recuperaArv(Tree **raiz, AuxStr *list) {
 				}
 			}
 			else {
-				if(list->codHuff[i] == '1') {
-					if((*raiz)->dir != NULL) {
+				if(list->codHuff[i] == '1') 
+				{
+					if((*raiz)->dir != NULL) 
+					{
 						if(list->codHuff[i+1] == '\0')
 							(*raiz)->dir->simbolo = list->simbolo;
 						else
 							*raiz = (*raiz)->dir;
 					}
-					else {
-						if(list->codHuff[i+1] != '\0') {
-							(*raiz)->dir = criaNoTree('#');
+					else 
+					{
+						if(list->codHuff[i+1] != '\0') 
+						{
+							(*raiz)->dir = criaNoTree('$');
 							*raiz = aux;
 							i = -1;
 						}
@@ -267,12 +298,13 @@ void recuperaArv(Tree **raiz, AuxStr *list) {
 	}
 }
 
-void buscaSimboloExibe(char a, AuxStr *tab) {
-	while(tab != NULL && tab->simbolo != a)
-		tab = tab->prox;
+void exibeSimbolo(AuxStr *aux, char simb) 
+{
+	while(aux != NULL && aux->simbolo != simb)
+		aux = aux->prox;
 	
-	if(tab != NULL)
-		printf("%s", tab->palavra);
+	if(aux != NULL)
+		printf("%s",aux->palavra);
 }
 
 void exibeFrase(FILE *ptr, Tree *arv, AuxStr *tab) {
