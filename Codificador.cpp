@@ -199,12 +199,12 @@ int main(void)
 	salvarArqBin(list);
 	
 	//exibe a arvore montada graficamente (da para melhorar)
-	exibeh(lTree->arv);
+	exibeh(lTree->arv,0);
 	
 	auxL = NULL;
 	
 	//separa a frase de maneira que repete as palavras e espaços
-	separarTudo("A tecnologia transforma o mundo ao conectar pessoas, ideias e oportunidades. Por meio de solucoes criativas, inteligentes e acessiveis, e possivel aproximar comunidades, otimizar processos e impulsionar o desenvolvimento.", &auxL);
+	separarTudo("A tecnologia transforma o mundo ao conectar pessoas, ideias e oportunidades. ", &auxL);
 	
 	//cria uma copia da list da frase original
 	criarCopia(auxL, &alterado);

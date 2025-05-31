@@ -85,7 +85,8 @@ void criaLista(ListTree **listI, AuxStr **auxS)
 		ordenaLista(&*listI, &novoList);
 }
 
-void criaNovaCaixaL(Tree **pri, Tree **seg, ListTree **novo) {
+void criaNovaCaixaL(Tree **pri, Tree **seg, ListTree **novo) 
+{
 	Tree *noTree = (Tree*)malloc(sizeof(Tree));
 	
 	*novo = (ListTree*)malloc(sizeof(ListTree));
@@ -93,11 +94,13 @@ void criaNovaCaixaL(Tree **pri, Tree **seg, ListTree **novo) {
 	noTree->qtde = (*pri)->qtde + (*seg)->qtde;
 	noTree->simbolo = '#';
 	
-	if((*pri)->qtde > (*seg)->qtde) {
+	if((*pri)->qtde > (*seg)->qtde) 
+	{
 		noTree->esq = *seg;
 		noTree->dir = *pri;
 	}
-	else {
+	else 
+	{
 		noTree->dir = *seg;
 		noTree->esq = *pri;
 	}
@@ -127,24 +130,21 @@ void criaHuffman(ListTree **listI)
     }
 }
 
-void exibeh(tree *raiz)
+void exibeh(tree *raiz, int nivel)
 {
-    static int n = -1;
-    if (raiz != NULL)
+    if(raiz != NULL)
     {
-        n++;
-        exibeh(raiz->dir); 
+        exibeh(raiz->dir, nivel + 1); 
 
-        for (int i = 0; i < 5 * n; i++)
+        for(int i = 0; i < 5 * nivel; i++)
             printf(" ");
 
         printf("(%d, %d)\n", raiz->simbolo, raiz->qtde);
 
-        exibeh(raiz->esq);
-
-        n--;
+        exibeh(raiz->esq, nivel + 1);
     }
 }
+
 
 void adicionaCodHuff(Tree *raiz, char cod[1000], int *TL, AuxStr **list) 
 {
@@ -237,7 +237,8 @@ Tree* criaNoTree(char simbolo)
 	return novo;
 }
 
-void recuperaArv(Tree **raiz, AuxStr *list) {
+void recuperaArv(Tree **raiz, AuxStr *list) 
+{
 	Tree *aux;
 	int i;
 	
@@ -307,7 +308,8 @@ void exibeSimbolo(AuxStr *aux, char simb)
 		printf("%s",aux->palavra);
 }
 
-void exibeFrase(FILE *ptr, Tree *arv, AuxStr *tab) {
+void exibeFrase(FILE *ptr, Tree *arv, AuxStr *tab) 
+{
 	Tree *auxTree = arv;
 	AuxStr *a;
 	char bit, frase[300];
@@ -315,11 +317,14 @@ void exibeFrase(FILE *ptr, Tree *arv, AuxStr *tab) {
 	
 	bit = getc(ptr);
 	
-	while(!feof(ptr) && bit != '\0') {
-		while(!feof(ptr) && auxTree->dir != NULL && auxTree->esq != NULL) {
+	while(!feof(ptr) && bit != '\0') 
+	{
+		while(!feof(ptr) && auxTree->dir != NULL && auxTree->esq != NULL) 
+		{
 			if(bit == '0')
 				auxTree = auxTree->esq;
-			else {
+			else 
+			{
 				if(bit == '1')
 					auxTree = auxTree->dir;
 			}
@@ -329,7 +334,8 @@ void exibeFrase(FILE *ptr, Tree *arv, AuxStr *tab) {
 		while(a != NULL && a->simbolo != auxTree->simbolo)
 			a = a->prox;
 		
-		if(a != NULL) {
+		if(a != NULL) 
+		{
 			for(j=0 ; a->palavra[j] != '\0' ; j++, TL++)
 				frase[TL] = a->palavra[j];
 			frase[TL] = 32;
@@ -344,18 +350,3 @@ void exibeFrase(FILE *ptr, Tree *arv, AuxStr *tab) {
 	fclose(ptr);
 }
 
-void exibeArv(Tree *a) {
-    int i;
-    static int n = -1;
-
-    if (a != NULL) {
-        n++;
-        exibeArv(a->dir);
-        for (i = 0; i < 5 * n; i++) {
-            printf(" ");
-        }
-        printf(" (%c)\n", a->simbolo);
-        exibeArv(a->esq);
-        n--;
-    }
-}
